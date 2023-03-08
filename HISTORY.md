@@ -1,11 +1,16 @@
 # History
 
+## 5.1.0
+* **[ BREAKING ]** Add support for `rescript@10.1.2` contexts
+
 ## 5.0.0
 * **[ BREAKING ]** Switch to `@rescript/react`.
 * **[ BREAKING ]** Switch to `rescript` from `bs-platform`.
 * **[ BREAKING ]** Drop support for `rescript-logger`
+* **[ BREAKING ]** Update to `rescript@10`.
+* **[ BREAKING ]** Replace `bs-webapi` with `rescript-webapi`.
 
-## 4.0.0-beta.1
+## 4.0.0
 * **[ BREAKING ]** Switch to `@rescript/react`.
 * **[ BREAKING ]** Update `bs-platform`.
 
@@ -14,7 +19,7 @@
 * **[ BREAKING ]** Move `bs-webapi` to peer dependensies.
 
 ## 2.0.0
-* **[ BREAKING ]** Modules of `DndEntry` type must provide `cmp` function to avoid polymorphic comparison. See [this diff](https://github.com/MinimaHQ/re-dnd/commit/238a0abab8ad88a7c643c0b022c49887c025a89b) for details.
+* **[ BREAKING ]** Modules of `DndEntry` type must provide `cmp` function to avoid polymorphic comparison. See [this diff](https://github.com/MinimaHQ/rescript-dnd/commit/238a0abab8ad88a7c643c0b022c49887c025a89b) for details.
 * **[ BREAKING ]** Minimum required version of `bs-platform` is `7.1.1`.
 * **[ BREAKING ]** Minimum required version of `reason-react` is `0.8.0`.
 

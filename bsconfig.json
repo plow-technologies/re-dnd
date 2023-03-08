@@ -1,5 +1,5 @@
 {
-  "name": "re-dnd",
+  "name": "rescript-dnd",
   "sources": [
     {
       "dir": "src",
@@ -12,16 +12,19 @@
     }
   ],
   "bs-dependencies": [
-    "@rescript/react"
+    "@rescript/react",
+    "rescript-webapi"
   ],
   "bs-dev-dependencies": [
-    "re-classnames"
+    "rescript-classnames"
   ],
   "reason": {
     "react-jsx": 3
   },
   "refmt": 3,
-  "bsc-flags": ["-open Belt"],
+  "bsc-flags": [
+    "-open Belt"
+  ],
   "package-specs": {
     "module": "es6",
     "in-source": true

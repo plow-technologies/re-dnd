@@ -229,18 +229,10 @@ module Make = (Context: Context.T) => {
     }
 
     let onMouseUp = (startDropping: React.ref<unit => unit>, _event) => {
-      %log.debug(
-        "MouseUp"
-        ("", "")
-      )
       startDropping.current()
     }
 
     let onKeyDown = (cancelDrag: React.ref<unit => unit>, event) => {
-      %log.debug(
-        "KeyDown"
-        ("", "")
-      )
       switch event->Events.Keyboard.Dom.key {
       | Esc =>
         // Stopping propagation to prevent closing modal while dragging
@@ -338,36 +330,11 @@ module Make = (Context: Context.T) => {
       None,
     )
 
-    let updateGhostPosition = React.useRef(_point =>
-      %log.warn(
-        "UpdateGhostPositionNotSet"
-        ("Point", _point)
-      )
-    )
-    let updateScrollPosition = React.useRef(_ghost =>
-      %log.warn(
-        "UpdateScrollPositionNotSet"
-        ("Ghost", _ghost)
-      )
-    )
-    let invalidateLayout = React.useRef(_ghost =>
-      %log.warn(
-        "InvalidateLayoutNotSet"
-        ("Ghost", _ghost)
-      )
-    )
-    let startDropping = React.useRef(() =>
-      %log.warn(
-        "StartDroppingNotSet"
-        ("", "")
-      )
-    )
-    let cancelDrag = React.useRef(() =>
-      %log.warn(
-        "CancelDragNotSet"
-        ("", "")
-      )
-    )
+    let updateGhostPosition = React.useRef(_point => ())
+    let updateScrollPosition = React.useRef(_ghost => ())
+    let invalidateLayout = React.useRef(_ghost => ())
+    let startDropping = React.useRef(() => ())
+    let cancelDrag = React.useRef(() => ())
 
     let (state, dispatch) = React.useReducer((state, action) =>
       switch action {
@@ -394,10 +361,6 @@ module Make = (Context: Context.T) => {
         | Dragging(ghost, _) =>
           let (ghost, result) = switch ghost.targetContainer {
           | None =>
-            %log.debug(
-              "StartDropping::NoTargetContainer"
-              ("", "")
-            )
             let container = containers.current->Map.getExn(ghost.originalContainer)
             let scrollableDelta = switch container.scrollable {
             | Some(scrollable) =>
@@ -420,10 +383,6 @@ module Make = (Context: Context.T) => {
             (nextGhost, None)
 
           | Some(targetContainerId) if ghost.targetingOriginalContainer =>
-            %log.debug(
-              "StartDropping::TargetingOriginalContainer"
-              ("ContainerId", targetContainerId)
-            )
             let container = containers.current->Map.getExn(targetContainerId)
             let scroll = scroll.current->Option.getExn
             let scrollableDelta = switch container.scrollable {
@@ -479,10 +438,6 @@ module Make = (Context: Context.T) => {
             switch before {
             | Some(#FirstOmegaItemFound(item))
             | Some(#NextItemAfterLastAlphaFound(item)) =>
-              %log.debug(
-                "StartDropping::TargetingOriginalContainer::Result::Before"
-                ("Item", item)
-              )
               let itemGeometry = item.geometry->Option.getExn
               let itemRect = Geometry.shiftInternalSibling(
                 ghost.axis,
@@ -510,10 +465,6 @@ module Make = (Context: Context.T) => {
               )
 
             | Some(#SearchingForLastAlphaItem(item)) =>
-              %log.debug(
-                "StartDropping::TargetingOriginalContainer::Result::Last"
-                ("Item", item)
-              )
               let itemGeometry = item.geometry->Option.getExn
               let itemRect = Geometry.shiftInternalSibling(
                 ghost.axis,
@@ -540,12 +491,7 @@ module Make = (Context: Context.T) => {
                 Some(ReorderResult.SameContainer(ghost.itemId, Last)),
               )
 
-            | None =>
-              %log.debug(
-                "StartDropping::TargetingOriginalContainer::Result::None"
-                ("", "")
-              )
-              (
+            | None => (
                 {
                   ...ghost,
                   delta: {
@@ -598,10 +544,6 @@ module Make = (Context: Context.T) => {
 
             switch before {
             | Some(item) =>
-              %log.debug(
-                "StartDropping::TargetingNewContainer::Result::Before"
-                ("Item", item)
-              )
               let itemGeometry = item.geometry->Option.getExn
               let itemRect = Geometry.shiftExternalSibling(
                 ghost.axis,
@@ -631,10 +573,6 @@ module Make = (Context: Context.T) => {
             | None =>
               switch items->Array.get(items->Array.length - 1) {
               | Some(item) =>
-                %log.debug(
-                  "StartDropping::TargetingNewContainer::Result::Last"
-                  ("Item", item)
-                )
                 let itemGeometry = item.geometry->Option.getExn
                 let itemRect = Geometry.shiftExternalSibling(
                   ghost.axis,
@@ -660,12 +598,7 @@ module Make = (Context: Context.T) => {
                   },
                   Some(ReorderResult.NewContainer(ghost.itemId, targetContainerId, Last)),
                 )
-              | None =>
-                %log.debug(
-                  "StartDropping::TargetingNewContainer::Result::EmptyContainer"
-                  ("", "")
-                )
-                (
+              | None => (
                   {
                     ...ghost,
                     delta: Layout.calculateDeltaToLandGhostOnEmptyContainer(
@@ -806,7 +739,7 @@ module Make = (Context: Context.T) => {
         let ghost = {
           open Ghost
           {
-            itemId: itemId,
+            itemId,
             originalContainer: containerId,
             targetContainer: containerId->Some,
             targetingOriginalContainer: true,
@@ -818,9 +751,9 @@ module Make = (Context: Context.T) => {
             margins: style->Geometry.getMargins,
             borders: style->Geometry.getBorders,
             departurePoint: currentPoint,
-            currentPoint: currentPoint,
+            currentPoint,
             departureRect: currentRect,
-            currentRect: currentRect,
+            currentRect,
             delta: {
               x: 0.,
               y: 0.,
@@ -839,10 +772,6 @@ module Make = (Context: Context.T) => {
           open Subscriptions
           {
             install: () => {
-              %log.debug(
-                "MouseSubscriptions::SubscriptionsInstalled"
-                ("ItemId", itemId)
-              )
               Window.addMouseMoveEventListener(window, onMouseMove)
               Window.addMouseUpEventListener(window, onMouseUp)
               HtmlElement.addKeyDownEventListener(ghost.element, onKeyDown)
@@ -850,10 +779,6 @@ module Make = (Context: Context.T) => {
               Window.addEventListener(window, "visibilitychange", onVisibilityChange)
             },
             drop: () => {
-              %log.debug(
-                "MouseSubscriptions::SubscriptionsDropped"
-                ("ItemId", itemId)
-              )
               Window.removeMouseMoveEventListener(window, onMouseMove)
               Window.removeMouseUpEventListener(window, onMouseUp)
               HtmlElement.removeKeyDownEventListener(ghost.element, onKeyDown)
@@ -871,10 +796,6 @@ module Make = (Context: Context.T) => {
           open Subscriptions
           {
             install: () => {
-              %log.debug(
-                "TouchSubscriptions::SubscriptionsInstalled"
-                ("ItemId", itemId)
-              )
               Window.addEventListener(window, "touchmove", onTouchMove)
               Window.addEventListener(window, "touchend", onTouchEnd)
               Window.addEventListener(window, "contextmenu", onContextMenu)
@@ -882,10 +803,6 @@ module Make = (Context: Context.T) => {
               Window.addEventListener(window, "visibilitychange", onVisibilityChange)
             },
             drop: () => {
-              %log.debug(
-                "TouchSubscriptions::SubscriptionsDropped"
-                ("ItemId", itemId)
-              )
               Window.removeEventListener(window, "touchmove", onTouchMove)
               Window.removeEventListener(window, "touchend", onTouchEnd)
               Window.removeEventListener(window, "contextmenu", onContextMenu)
@@ -901,7 +818,7 @@ module Make = (Context: Context.T) => {
         containers.current =
           containers.current->Map.map(container => {
             let (geometry, scrollable) = container.getGeometryAndScrollable()
-            {...container, geometry: geometry->Some, scrollable: scrollable}
+            {...container, geometry: geometry->Some, scrollable}
           })
 
         viewport.current = Geometry.getViewport()->Some
@@ -943,15 +860,17 @@ module Make = (Context: Context.T) => {
       | _ as ids =>
         items.current =
           ids->List.reduceU(items.current, (. map, id) =>
-            map->Map.updateU(id, (. item) =>
-              switch item {
-              | Some(item) =>
-                Some({
-                  open ItemBag
-                  {...item, animating: false}
-                })
-              | None => None
-              }
+            map->Map.updateU(
+              id,
+              (. item) =>
+                switch item {
+                | Some(item) =>
+                  Some({
+                    open ItemBag
+                    {...item, animating: false}
+                  })
+                | None => None
+                },
             )
           )
       }
@@ -1111,8 +1030,8 @@ module Make = (Context: Context.T) => {
 
         let nextGhost = {
           ...ghost,
-          targetContainer: targetContainer,
-          targetingOriginalContainer: targetingOriginalContainer,
+          targetContainer,
+          targetingOriginalContainer,
           direction: switch nextDirection {
           | Some(direction) => Some(direction)
           | None => ghost.direction
@@ -1223,30 +1142,35 @@ module Make = (Context: Context.T) => {
           }
 
           containers.current =
-            containers.current->Map.map(container =>
-              switch container.scrollable {
-              | Some(scrollable) => {
-                  ...container,
-                  geometry: container.geometry->Option.map(geometry => {
-                    ...geometry,
-                    rect: geometry.rect->Geometry.shiftViewportRect(delta),
-                  }),
-                  scrollable: Some({
-                    ...scrollable,
-                    geometry: {
-                      ...scrollable.geometry,
-                      rect: scrollable.geometry.rect->Geometry.shiftViewportRect(delta),
-                    },
-                  }),
-                }
-              | None => {
-                  ...container,
-                  geometry: container.geometry->Option.map(geometry => {
-                    ...geometry,
-                    rect: geometry.rect->Geometry.shiftViewportRect(delta),
-                  }),
-                }
-              }
+            containers.current->Map.map(
+              container =>
+                switch container.scrollable {
+                | Some(scrollable) => {
+                    ...container,
+                    geometry: container.geometry->Option.map(
+                      geometry => {
+                        ...geometry,
+                        rect: geometry.rect->Geometry.shiftViewportRect(delta),
+                      },
+                    ),
+                    scrollable: Some({
+                      ...scrollable,
+                      geometry: {
+                        ...scrollable.geometry,
+                        rect: scrollable.geometry.rect->Geometry.shiftViewportRect(delta),
+                      },
+                    }),
+                  }
+                | None => {
+                    ...container,
+                    geometry: container.geometry->Option.map(
+                      geometry => {
+                        ...geometry,
+                        rect: geometry.rect->Geometry.shiftViewportRect(delta),
+                      },
+                    ),
+                  }
+                },
             )
 
           scroll.current = nextScroll->Some
@@ -1289,30 +1213,35 @@ module Make = (Context: Context.T) => {
           }
 
           containers.current =
-            containers.current->Map.map(container =>
-              switch container.scrollable {
-              | Some(scrollable') if scrollable'.element === scrollable.element => {
-                  ...container,
-                  geometry: container.geometry->Option.map(geometry => {
-                    ...geometry,
-                    rect: geometry.rect->Geometry.shiftRects(delta),
-                  }),
-                  scrollable: Some({...scrollable, scroll: nextScroll}),
-                }
-              | Some(scrollable')
-                if Geometry.contains(
-                  ~parent=scrollable.geometry.rect.page,
-                  ~child=scrollable'.geometry.rect.page,
-                ) => {
-                  ...container,
-                  geometry: container.geometry->Option.map(geometry => {
-                    ...geometry,
-                    rect: geometry.rect->Geometry.shiftRects(delta),
-                  }),
-                }
-              | Some(_)
-              | None => container
-              }
+            containers.current->Map.map(
+              container =>
+                switch container.scrollable {
+                | Some(scrollable') if scrollable'.element === scrollable.element => {
+                    ...container,
+                    geometry: container.geometry->Option.map(
+                      geometry => {
+                        ...geometry,
+                        rect: geometry.rect->Geometry.shiftRects(delta),
+                      },
+                    ),
+                    scrollable: Some({...scrollable, scroll: nextScroll}),
+                  }
+                | Some(scrollable')
+                  if Geometry.contains(
+                    ~parent=scrollable.geometry.rect.page,
+                    ~child=scrollable'.geometry.rect.page,
+                  ) => {
+                    ...container,
+                    geometry: container.geometry->Option.map(
+                      geometry => {
+                        ...geometry,
+                        rect: geometry.rect->Geometry.shiftRects(delta),
+                      },
+                    ),
+                  }
+                | Some(_)
+                | None => container
+                },
             )
 
           invalidateLayout.current(ghost)
@@ -1555,10 +1484,6 @@ module Make = (Context: Context.T) => {
     // HACK: We have to add persistent event listener due to webkit bug:
     //       https://bugs.webkit.org/show_bug.cgi?id=184250
     React.useEffect1(() => {
-      %log.debug(
-        "AddTouchMoveWebkitEventListener"
-        ("Status", state.status)
-      )
       let preventTouchMoveInWebkit = event => {
         open Webapi.Dom
         switch state.status {
@@ -1573,10 +1498,6 @@ module Make = (Context: Context.T) => {
 
       Some(
         () => {
-          %log.debug(
-            "RemoveTouchMoveWebkitEventListener"
-            ("Status", state.status)
-          )
           preventTouchMoveInWebkit->Events.unsubscribeFromTouchMove
         },
       )
@@ -1593,10 +1514,10 @@ module Make = (Context: Context.T) => {
         | Collecting(_, containerId, _, _, _) => containerId->Some
         | StandBy => None
         },
-        registerItem: registerItem,
-        registerContainer: registerContainer,
-        disposeItem: disposeItem,
-        disposeContainer: disposeContainer,
+        registerItem,
+        registerContainer,
+        disposeItem,
+        disposeContainer,
         getItemShift: itemId => (items.current->Map.getExn(itemId)).shift,
         startDragging: collectEntries,
       }>

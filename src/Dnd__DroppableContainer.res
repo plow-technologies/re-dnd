@@ -27,8 +27,8 @@ module Make = (Context: Context.T) => {
         Some({
           open ScrollableElement
           {
-            element: element,
-            geometry: geometry,
+            element,
+            geometry,
             scroll: {
               open Scroll
               {
@@ -67,15 +67,11 @@ module Make = (Context: Context.T) => {
     React.useEffect2(() =>
       switch (prevStatus, ctx.status) {
       | (Some(StandBy), Collecting(_)) =>
-        %log.debug(
-          "RegisterItem"
-          ("ContainerId", containerId)
-        )
         ctx.registerContainer({
           id: containerId,
-          axis: axis,
-          lockAxis: lockAxis,
-          accept: accept,
+          axis,
+          lockAxis,
+          accept,
           element: element.current
           ->Js.Nullable.toOption
           ->Option.getExn
@@ -165,7 +161,8 @@ module Make = (Context: Context.T) => {
       | StandBy
       | Collecting(_)
       | Dragging(_)
-      | Dropping(_) => <>
+      | Dropping(_) =>
+        <>
           children
           <div
             style={ReactDOM.Style.make(

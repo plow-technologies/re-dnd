@@ -47,12 +47,12 @@
     "rescript-webapi": ">=0.6.0"
   },
   "devDependencies": {
-    "@rescript/react": ">=0.10.3",
+    "@rescript/react": "^0.11.0",
     "autoprefixer": "9.8.6",
     "bsb-js": "1.1.7",
     "parcel-bundler": "1.12.4",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "rescript": "10.1.2",
     "rescript-classnames": "6.0.0",
     "rescript-webapi": "0.6.1"

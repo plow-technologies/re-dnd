@@ -1,5 +1,5 @@
 {
-  "name": "rescript-dnd",
+  "name": "re-dnd",
   "sources": [
     {
       "dir": "src",

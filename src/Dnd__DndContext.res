@@ -69,8 +69,10 @@ module Make = (Item: DndEntry, Container: DndEntry) => {
   })
 
   module Provider = {
-    let make = x->React.Context.provider
-    let makeProps = ReactContext.makeProps
+    let provider = x->React.Context.provider
+
+    @react.component
+    let make = (~value, ~children) => React.createElement(provider, {value, children})
   }
 
   let useDnd = () => React.useContext(x)
